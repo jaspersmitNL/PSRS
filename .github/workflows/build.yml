@@ -1,0 +1,25 @@
+name: build
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: build executable
+        run: cargo build --release
+
+      - name: artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: psrs-${{ matrix.os }}
+          path: target/release/psrs*

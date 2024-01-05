@@ -485,8 +485,47 @@ fn main() {
     let args = Args::parse();
     args.check();
 
-    let source = read_file(args.input);
+    if args.input.is_dir() && args.output.is_dir() {
+        println!(
+            "Converting all files in {} to {}",
+            args.input.display(),
+            args.output.display()
+        );
 
+        for entry in std::fs::read_dir(args.input).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
+
+            if path.is_file() {
+                let source = read_file(path.clone());
+                let result = match args.mode.as_str() {
+                    "json2ps" => convert_json2ps(source),
+                    "ps2json" => convert_ps2json(source),
+                    _ => panic!("Invalid mode: {}", args.mode),
+                };
+
+                let mut output = args.output.clone();
+                output.push(path.file_name().unwrap());
+
+                let mut output = output.to_str().unwrap().to_string();
+
+                if args.mode == "json2ps" {
+                    output.push_str(".ps1");
+                }
+
+                if args.mode == "ps2json" {
+                    output.push_str(".json");
+                }
+
+                write_file(PathBuf::from(output), result);
+                println!("Converted {}", path.display());
+            }
+        }
+
+        return;
+    }
+
+    let source = read_file(args.input);
     let result = match args.mode.as_str() {
         "json2ps" => convert_json2ps(source),
         "ps2json" => convert_ps2json(source),

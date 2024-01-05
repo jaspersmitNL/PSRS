@@ -388,7 +388,7 @@ impl writer::Writer {
                     );
                 }
                 self.indent -= 4;
-                result.push_str(format!("{}}}\n", writer::padding(self.indent)).as_str());
+                result.push_str(format!("{}}}", writer::padding(self.indent)).as_str());
             }
             serde_json::Value::Array(arr) => {
                 result.push_str(format!("@(\n").as_str());

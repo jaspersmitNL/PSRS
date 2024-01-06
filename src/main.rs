@@ -416,6 +416,9 @@ impl writer::Writer {
                     false => "$false".to_string(),
                 }
             }
+            serde_json::Value::Null => {
+                result = "$null".to_string();
+            }
 
             v => {
                 panic!("Unsupported value type: {:?}", v)
